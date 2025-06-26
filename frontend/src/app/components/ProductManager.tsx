@@ -3,19 +3,25 @@
 import { useState } from 'react';
 import * as api from '@/lib/api';
 import { Product, CreateProduct } from '@/lib/types';
-
-// Reusable Modal Component (assuming it's defined elsewhere or defined here)
-function Modal({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => void, children: React.ReactNode }) {
-    if (!isOpen) return null;
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-            <div className="bg-white p-8 rounded-lg shadow-xl relative w-full max-w-lg">
-                <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
-                {children}
-            </div>
-        </div>
-    );
-}
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Product Form
 function ProductForm({ product, groupId, onSave, onCancel }: { product?: Product, groupId: number, onSave: (product: Product) => void, onCancel: () => void }) {
@@ -46,34 +52,36 @@ function ProductForm({ product, groupId, onSave, onCancel }: { product?: Product
     
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-2xl font-bold">{product ? 'Edit' : 'Create'} Product</h2>
+            <DialogHeader>
+                <DialogTitle>{product ? 'Edit' : 'Create'} Product</DialogTitle>
+            </DialogHeader>
             {error && <div className="bg-red-100 text-red-700 p-3 rounded">{error}</div>}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="name" className="block text-sm font-medium">Name</label>
-                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full input" />
+                    <Label htmlFor="name">Name</Label>
+                    <Input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
                 </div>
                 <div>
-                    <label htmlFor="manufacturer" className="block text-sm font-medium">Manufacturer</label>
-                    <input type="text" id="manufacturer" value={manufacturer} onChange={e => setManufacturer(e.target.value)} required className="mt-1 block w-full input" />
+                    <Label htmlFor="manufacturer">Manufacturer</Label>
+                    <Input type="text" id="manufacturer" value={manufacturer} onChange={e => setManufacturer(e.target.value)} required />
                 </div>
                 <div className="md:col-span-2">
-                    <label htmlFor="description" className="block text-sm font-medium">Description</label>
-                    <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} required rows={3} className="mt-1 block w-full input" />
+                    <Label htmlFor="description">Description</Label>
+                    <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} required rows={3} />
                 </div>
                 <div>
-                    <label htmlFor="price" className="block text-sm font-medium">Price</label>
-                    <input type="number" id="price" value={price} onChange={e => setPrice(parseFloat(e.target.value))} required min="0" step="0.01" className="mt-1 block w-full input" />
+                    <Label htmlFor="price">Price</Label>
+                    <Input type="number" id="price" value={price} onChange={e => setPrice(parseFloat(e.target.value))} required min="0" step="0.01" />
                 </div>
                 <div>
-                    <label htmlFor="quantity" className="block text-sm font-medium">Quantity</label>
-                    <input type="number" id="quantity" value={quantity} onChange={e => setQuantity(parseInt(e.target.value))} required min="0" className="mt-1 block w-full input" />
+                    <Label htmlFor="quantity">Quantity</Label>
+                    <Input type="number" id="quantity" value={quantity} onChange={e => setQuantity(parseInt(e.target.value))} required min="0" />
                 </div>
             </div>
-            <div className="flex justify-end space-x-2">
-                <button type="button" onClick={onCancel} className="btn-secondary">Cancel</button>
-                <button type="submit" className="btn-primary">Save</button>
-            </div>
+            <DialogFooter>
+                <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+                <Button type="submit">Save</Button>
+            </DialogFooter>
         </form>
     );
 }
@@ -107,16 +115,18 @@ function StockForm({ product, onSave, onCancel, mode }: { product: Product, onSa
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-             <h2 className="text-2xl font-bold">{mode === 'add' ? 'Add Stock' : 'Sell Stock'} for {product.name}</h2>
-             {error && <div className="bg-red-100 text-red-700 p-3 rounded">{error}</div>}
-             <div>
-                 <label htmlFor="amount" className="block text-sm font-medium">Amount</label>
-                 <input type="number" id="amount" value={amount} onChange={e => setAmount(parseInt(e.target.value))} required min="1" className="mt-1 block w-full input" />
-             </div>
-             <div className="flex justify-end space-x-2">
-                 <button type="button" onClick={onCancel} className="btn-secondary">Cancel</button>
-                 <button type="submit" className="btn-primary">Confirm</button>
-             </div>
+            <DialogHeader>
+                <DialogTitle>{mode === 'add' ? 'Add Stock' : 'Sell Stock'} for {product.name}</DialogTitle>
+            </DialogHeader>
+            {error && <div className="bg-red-100 text-red-700 p-3 rounded">{error}</div>}
+            <div>
+                <Label htmlFor="amount">Amount</Label>
+                <Input type="number" id="amount" value={amount} onChange={e => setAmount(parseInt(e.target.value))} required min="1" />
+            </div>
+            <DialogFooter>
+                <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+                <Button type="submit">Confirm</Button>
+            </DialogFooter>
         </form>
     );
 }
@@ -142,6 +152,7 @@ export default function ProductManager({ products, groupId, onProductsChange }: 
             : [...products, product];
         onProductsChange(newProducts);
         setProductModalOpen(false);
+        setStockModalOpen(false);
     };
 
     const handleDeleteProduct = async () => {
@@ -170,50 +181,66 @@ export default function ProductManager({ products, groupId, onProductsChange }: 
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
-            <button onClick={() => openProductModal()} className="mb-4 btn-primary">
+            <Button onClick={() => openProductModal()} className="mb-4">
                 Add New Product
-            </button>
-
-            <table className="w-full text-left table-auto">
-                {/* table head */}
-                <tbody>
+            </Button>
+            
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Manufacturer</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {products.map(product => (
-                        <tr key={product.id} className="border-b">
-                            <td className="p-2">{product.name}</td>
-                            <td className="p-2">{product.manufacturer}</td>
-                            <td className="p-2">{product.quantity}</td>
-                            <td className="p-2">${product.price.toFixed(2)}</td>
-                            <td className="p-2 space-x-2">
-                                <button onClick={() => openStockModal(product, 'add')} className="text-green-500">Add</button>
-                                <button onClick={() => openStockModal(product, 'sell')} className="text-blue-500">Sell</button>
-                                <button onClick={() => openProductModal(product)} className="text-yellow-500">Edit</button>
-                                <button onClick={() => openDeleteModal(product)} className="text-red-500">Delete</button>
-                            </td>
-                        </tr>
+                        <TableRow key={product.id}>
+                            <TableCell>{product.name}</TableCell>
+                            <TableCell>{product.manufacturer}</TableCell>
+                            <TableCell>{product.quantity}</TableCell>
+                            <TableCell>${product.price.toFixed(2)}</TableCell>
+                            <TableCell className="text-right space-x-2">
+                                <Button variant="ghost" size="sm" onClick={() => openStockModal(product, 'add')}>Add</Button>
+                                <Button variant="ghost" size="sm" onClick={() => openStockModal(product, 'sell')}>Sell</Button>
+                                <Button variant="ghost" size="sm" onClick={() => openProductModal(product)}>Edit</Button>
+                                <Button variant="destructive" size="sm" onClick={() => openDeleteModal(product)}>Delete</Button>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
 
-            <Modal isOpen={isProductModalOpen} onClose={() => setProductModalOpen(false)}>
-                <ProductForm product={selectedProduct} groupId={groupId} onSave={handleSaveProduct} onCancel={() => setProductModalOpen(false)} />
-            </Modal>
+            <Dialog open={isProductModalOpen} onOpenChange={setProductModalOpen}>
+                <DialogContent>
+                    <ProductForm product={selectedProduct} groupId={groupId} onSave={handleSaveProduct} onCancel={() => setProductModalOpen(false)} />
+                </DialogContent>
+            </Dialog>
 
             {selectedProduct && (
-                <Modal isOpen={isStockModalOpen} onClose={() => setStockModalOpen(false)}>
-                    <StockForm product={selectedProduct} mode={stockMode} onSave={handleSaveProduct} onCancel={() => setStockModalOpen(false)} />
-                </Modal>
+                <Dialog open={isStockModalOpen} onOpenChange={setStockModalOpen}>
+                    <DialogContent>
+                        <StockForm product={selectedProduct} mode={stockMode} onSave={handleSaveProduct} onCancel={() => setStockModalOpen(false)} />
+                    </DialogContent>
+                </Dialog>
             )}
 
-            <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
-                <div>
-                    <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
-                    <p>Are you sure you want to delete the product &quot;{selectedProduct?.name}&quot;?</p>
-                    <div className="flex justify-end space-x-2 mt-6">
-                        <button onClick={() => setDeleteModalOpen(false)} className="btn-secondary">Cancel</button>
-                        <button onClick={handleDeleteProduct} className="btn-danger">Delete</button>
-                    </div>
-                </div>
-            </Modal>
+            <Dialog open={isDeleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete the product &quot;{selectedProduct?.name}&quot;? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleDeleteProduct}>Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 } 
