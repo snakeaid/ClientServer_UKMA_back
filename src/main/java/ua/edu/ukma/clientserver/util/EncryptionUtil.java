@@ -11,7 +11,7 @@ public class EncryptionUtil {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     // This is a hardcoded key. In a real application, this should be managed securely.
-    private static final byte[] KEY = "MySuperSecretKeyForEncryption12".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] KEY = "MySuperSecretKeyForEncryption123".getBytes(StandardCharsets.UTF_8);
     private static final int IV_LENGTH_BYTES = 16;
 
     public static String encrypt(String plainText) {
