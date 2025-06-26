@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpServer;
 import ua.edu.ukma.clientserver.server.db.DbConnection;
 import ua.edu.ukma.clientserver.server.db.ProductGroupRepository;
 import ua.edu.ukma.clientserver.server.db.ProductRepository;
+import ua.edu.ukma.clientserver.server.handlers.ProductGroupHandler;
+import ua.edu.ukma.clientserver.server.handlers.ProductHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,6 +19,9 @@ public class Server {
         ProductRepository productRepository = new ProductRepository(dbConnection);
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+
+        server.createContext("/api/groups", new ProductGroupHandler(productGroupRepository));
+        server.createContext("/api/products", new ProductHandler(productRepository));
 
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
