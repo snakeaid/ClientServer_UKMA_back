@@ -1,20 +1,14 @@
-package ua.edu.ukma.clientserver.server.dao;
+package ua.edu.ukma.clientserver.server.db;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-public abstract class BaseDao {
+public abstract class DbConnection {
 
     private final Connection connection;
 
-    public BaseDao() {
+    public DbConnection() {
         String url = "jdbc:postgresql://localhost:5432/mydb";
         String user = "root";
         String password = "root";
