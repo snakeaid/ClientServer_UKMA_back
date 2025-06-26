@@ -3,10 +3,11 @@ package ua.edu.ukma.clientserver.server.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ua.edu.ukma.clientserver.util.EncryptionUtil;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public abstract class BaseHandler implements HttpHandler {
 
@@ -35,15 +36,18 @@ public abstract class BaseHandler implements HttpHandler {
     protected abstract void handleRequest(HttpExchange exchange) throws IOException;
 
     protected <T> T readRequestBody(HttpExchange exchange, Class<T> type) throws IOException {
-        InputStreamReader reader = new InputStreamReader(exchange.getRequestBody(), "UTF-8");
-        return gson.fromJson(reader, type);
+        String encryptedBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        String json = EncryptionUtil.decrypt(encryptedBody);
+        return gson.fromJson(json, type);
     }
 
     protected void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
+        String encryptedResponse = EncryptionUtil.encrypt(response);
+
+        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+        exchange.sendResponseHeaders(statusCode, encryptedResponse.getBytes().length);
         OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
+        os.write(encryptedResponse.getBytes());
         os.close();
     }
 } 
