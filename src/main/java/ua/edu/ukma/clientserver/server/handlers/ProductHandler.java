@@ -20,10 +20,15 @@ public class ProductHandler extends BaseHandler {
     protected void handleRequest(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
+        String query = exchange.getRequestURI().getQuery();
 
         if (path.equals("/api/products")) {
             if (method.equals("GET")) {
-                handleGetAllProducts(exchange);
+                if (query != null && query.startsWith("groupId=")) {
+                    handleGetProductsByGroupId(exchange, query);
+                } else {
+                    handleGetAllProducts(exchange);
+                }
             } else if (method.equals("POST")) {
                 handleCreateProduct(exchange);
             }
@@ -137,6 +142,16 @@ public class ProductHandler extends BaseHandler {
         int newQuantity = product.quantity() - request.amount();
         productRepository.updateProduct(new Product(id, product.groupId(), product.name(), product.description(), product.manufacturer(), newQuantity, product.price()));
         sendResponse(exchange, 200, "{\"message\":\"Stock sold successfully\"}");
+    }
+
+    private void handleGetProductsByGroupId(HttpExchange exchange, String query) throws IOException {
+        try {
+            int groupId = Integer.parseInt(query.split("=")[1]);
+            List<Product> products = productRepository.getProductsByGroupId(groupId);
+            sendResponse(exchange, 200, gson.toJson(products));
+        } catch (NumberFormatException e) {
+            sendResponse(exchange, 400, "{\"error\":\"Invalid group ID format\"}");
+        }
     }
 
     private static class AmountUpdateRequest {

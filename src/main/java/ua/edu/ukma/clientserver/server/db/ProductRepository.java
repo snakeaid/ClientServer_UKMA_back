@@ -125,6 +125,48 @@ public class ProductRepository {
         }
     }
 
+    public List<Product> getProductsByGroupId(int groupId) {
+        String sql = "SELECT * FROM products WHERE group_id = ? ORDER BY id";
+        List<Product> products = new ArrayList<>();
+        try (PreparedStatement statement = dbConnection.getConnection().prepareStatement(sql)) {
+            statement.setInt(1, groupId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                products.add(mapRowToProduct(rs));
+            }
+            return products;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public BigDecimal getTotalValue() {
+        String sql = "SELECT SUM(quantity * price) AS total_value FROM products";
+        try (Statement statement = dbConnection.getConnection().createStatement()) {
+            ResultSet rs = statement.executeQuery(sql);
+            if (rs.next()) {
+                return rs.getBigDecimal("total_value");
+            }
+            return BigDecimal.ZERO;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public BigDecimal getTotalValueByGroupId(int groupId) {
+        String sql = "SELECT SUM(quantity * price) AS total_value FROM products WHERE group_id = ?";
+        try (PreparedStatement statement = dbConnection.getConnection().prepareStatement(sql)) {
+            statement.setInt(1, groupId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal("total_value");
+            }
+            return BigDecimal.ZERO;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Product mapRowToProduct(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         int groupId = rs.getInt("group_id");

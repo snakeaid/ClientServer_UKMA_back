@@ -6,6 +6,7 @@ import ua.edu.ukma.clientserver.server.db.ProductGroupRepository;
 import ua.edu.ukma.clientserver.server.db.ProductRepository;
 import ua.edu.ukma.clientserver.server.handlers.ProductGroupHandler;
 import ua.edu.ukma.clientserver.server.handlers.ProductHandler;
+import ua.edu.ukma.clientserver.server.handlers.StatsHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,6 +23,7 @@ public class Server {
 
         server.createContext("/api/groups", new ProductGroupHandler(productGroupRepository));
         server.createContext("/api/products", new ProductHandler(productRepository));
+        server.createContext("/api/stats/", new StatsHandler(productRepository));
 
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
