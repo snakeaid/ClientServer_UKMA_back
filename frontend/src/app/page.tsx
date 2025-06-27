@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as api from "@/lib/api";
 import { ProductGroup } from "@/lib/types";
 import GroupManager from "./components/GroupManager";
+import SearchBar from "./components/SearchBar";
 
 export default function HomePage() {
   const [groups, setGroups] = useState<ProductGroup[]>([]);
@@ -63,6 +64,10 @@ export default function HomePage() {
           </div>
         )}
       </header>
+
+      <div className="flex justify-center">
+        <SearchBar />
+      </div>
 
       <GroupManager 
         groups={groups}

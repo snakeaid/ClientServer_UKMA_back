@@ -243,4 +243,4 @@ export default function ProductManager({ products, groupId, onProductsChange }: 
             </Dialog>
         </div>
     );
-} 
+}
